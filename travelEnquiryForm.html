@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Enquiry Form</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to start for better scrolling */
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .form-container {
+            background-color: #ffffff;
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .tab-button.active {
+            background-color: #4f46e5; /* Indigo 600 */
+            color: white;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1); /* Makes calendar icon visible on dark background */
+        }
+        input[type="date"] {
+            color-scheme: light; /* Ensures calendar popup is light theme */
+        }
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="form-container">
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">Travel Enquiry Form</h1>
+
+        <!-- Tab Navigation -->
+        <div class="flex justify-center mb-6 space-x-4">
+            <button id="flightTab" class="tab-button px-6 py-3 rounded-lg text-lg font-medium text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200 active" onclick="showForm('flight')">Flight Booking</button>
+            <button id="hotelTab" class="tab-button px-6 py-3 rounded-lg text-lg font-medium text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200" onclick="showForm('hotel')">Hotel Booking</button>
+            <button id="packageTab" class="tab-button px-6 py-3 rounded-lg text-lg font-medium text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200" onclick="showForm('package')">Trip Package</button>
+        </div>
+
+        <!-- Enquiry Form -->
+        <form id="enquiryForm" class="space-y-6">
+            <!-- Common Enquiry Details -->
+            <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Your Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="enquiryName" class="block text-sm font-medium text-gray-700 mb-1">Name of Enquiry Person <span class="text-red-500">*</span></label>
+                        <input type="text" id="enquiryName" name="enquiryName" required
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label for="contactNumber" class="block text-sm font-medium text-gray-700 mb-1">Contact Number(s) <span class="text-red-500">*</span></label>
+                        <input type="tel" id="contactNumber" name="contactNumber" required
+                               pattern="[0-9]{10,15}" title="Please enter a valid phone number (10-15 digits)"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="+91-1234567890">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" name="email" required
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="john.doe@example.com">
+                    </div>
+                    <div>
+                        <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                        <input type="text" id="city" name="city"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="New York">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                        <textarea id="address" name="address" rows="3"
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                  placeholder="123 Main St, Apt 4B"></textarea>
+                    </div>
+                    <div>
+                        <label for="channel" class="block text-sm font-medium text-gray-700 mb-1">Channel <span class="text-red-500">*</span></label>
+                        <select id="channel" name="channel" required
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">Select Channel</option>
+                            <option value="Website">Website</option>
+                            <option value="Referral">Referral</option>
+                            <option value="Walk-in">Walk-in</option>
+                            <option value="Social Media">Social Media</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="reference" class="block text-sm font-medium text-gray-700 mb-1">Reference (Optional)</label>
+                        <input type="text" id="reference" name="reference"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="e.g., Friend's Name, Ad Code">
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="text-md font-medium text-gray-700 mb-2">Number of Passengers</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label for="numAdults" class="block text-sm font-medium text-gray-700 mb-1">Adults <span class="text-red-500">*</span></label>
+                            <input type="number" id="numAdults" name="numAdults" min="1" value="1" required
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="numKids" class="block text-sm font-medium text-gray-700 mb-1">Kids (2-12 yrs)</label>
+                            <input type="number" id="numKids" name="numKids" min="0" value="0"
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="numInfants" class="block text-sm font-medium text-gray-700 mb-1">Infants (<2 yrs)</label>
+                            <input type="number" id="numInfants" name="numInfants" min="0" value="0"
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="numTotalPax" class="block text-sm font-medium text-gray-700 mb-1">Total Pax</label>
+                            <input type="number" id="numTotalPax" name="numTotalPax" value="1" readonly
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 bg-gray-100 rounded-md shadow-sm sm:text-sm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flight Booking Section -->
+            <div id="flightDetails" class="enquiry-section bg-blue-50 p-6 rounded-lg shadow-inner">
+                <h2 class="text-xl font-semibold text-blue-700 mb-4">Flight Booking Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Trip Type <span class="text-red-500">*</span></label>
+                        <div class="flex items-center space-x-4 mt-1">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="flightTripType" value="One Way" class="form-radio text-indigo-600" checked>
+                                <span class="ml-2 text-gray-700">One Way</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="flightTripType" value="Round Trip" class="form-radio text-indigo-600">
+                                <span class="ml-2 text-gray-700">Round Trip</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="flightTripType" value="Multi-City" class="form-radio text-indigo-600">
+                                <span class="ml-2 text-gray-700">Multi-City</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="flightDepartureCity" class="block text-sm font-medium text-gray-700 mb-1">Departure City <span class="text-red-500">*</span></label>
+                        <input type="text" id="flightDepartureCity" name="flightDepartureCity" required
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="e.g., New York">
+                    </div>
+                    <div>
+                        <label for="flightArrivalCity" class="block text-sm font-medium text-gray-700 mb-1">Arrival City <span class="text-red-500">*</span></label>
+                        <input type="text" id="flightArrivalCity" name="flightArrivalCity" required
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="e.g., London">
+                    </div>
+                    <div>
+                        <label for="flightDepartureDate" class="block text-sm font-medium text-gray-700 mb-1">Departure Date <span class="text-red-500">*</span></label>
+                        <input type="date" id="flightDepartureDate" name="flightDepartureDate" required
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="flightReturnDate" class="block text-sm font-medium text-gray-700 mb-1">Return Date</label>
+                        <input type="date" id="flightReturnDate" name="flightReturnDate"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="flightPreferredAirline" class="block text-sm font-medium text-gray-700 mb-1">Preferred Airline (Optional)</label>
+                        <input type="text" id="flightPreferredAirline" name="flightPreferredAirline"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="e.g., Emirates, Qatar Airways">
+                    </div>
+                    <div>
+                        <label for="flightClass" class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-500">*</span></label>
+                        <select id="flightClass" name="flightClass" required
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="Economy">Economy</option>
+                            <option value="Premium Economy">Premium Economy</option>
+                            <option value="Business">Business</option>
+                            <option value="First Class">First Class</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hotel Booking Section -->
+            <div id="hotelDetails" class="enquiry-section bg-green-50 p-6 rounded-lg shadow-inner hidden">
+                <h2 class="text-xl font-semibold text-green-700 mb-4">Hotel Booking Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label for="hotelDestination" class="block text-sm font-medium text-gray-700 mb-1">Destination City / Hotel Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="hotelDestination" name="hotelDestination"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="e.g., Paris, The Ritz Hotel">
+                    </div>
+                    <div>
+                        <label for="hotelCheckinDate" class="block text-sm font-medium text-gray-700 mb-1">Check-in Date <span class="text-red-500">*</span></label>
+                        <input type="date" id="hotelCheckinDate" name="hotelCheckinDate"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="hotelCheckoutDate" class="block text-sm font-medium text-gray-700 mb-1">Check-out Date <span class="text-red-500">*</span></label>
+                        <input type="date" id="hotelCheckoutDate" name="hotelCheckoutDate"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="hotelNumRooms" class="block text-sm font-medium text-gray-700 mb-1">Number of Rooms <span class="text-red-500">*</span></label>
+                        <input type="number" id="hotelNumRooms" name="hotelNumRooms" min="1" value="1"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="hotelRoomType" class="block text-sm font-medium text-gray-700 mb-1">Room Type <span class="text-red-500">*</span></label>
+                        <select id="hotelRoomType" name="hotelRoomType"
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="Standard">Standard</option>
+                            <option value="Deluxe">Deluxe</option>
+                            <option value="Suite">Suite</option>
+                            <option value="Family Room">Family Room</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="hotelStarRating" class="block text-sm font-medium text-gray-700 mb-1">Star Rating Preference (Optional)</label>
+                        <select id="hotelStarRating" name="hotelStarRating"
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="Any">Any</option>
+                            <option value="3 Star">3 Star</option>
+                            <option value="4 Star">4 Star</option>
+                            <option value="5 Star">5 Star</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trip Package Section -->
+            <div id="packageDetails" class="enquiry-section bg-purple-50 p-6 rounded-lg shadow-inner hidden">
+                <h2 class="text-xl font-semibold text-purple-700 mb-4">Trip Package Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label for="packageDestination" class="block text-sm font-medium text-gray-700 mb-1">Destination / Package Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="packageDestination" name="packageDestination"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="e.g., Europe Tour, Bali Honeymoon">
+                    </div>
+                    <div>
+                        <label for="packageDepartureDate" class="block text-sm font-medium text-gray-700 mb-1">Departure Date <span class="text-red-500">*</span></label>
+                        <input type="date" id="packageDepartureDate" name="packageDepartureDate"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="packageReturnDate" class="block text-sm font-medium text-gray-700 mb-1">Return Date <span class="text-red-500">*</span></label>
+                        <input type="date" id="packageReturnDate" name="packageReturnDate"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="packageBudget" class="block text-sm font-medium text-gray-700 mb-1">Budget (Optional)</label>
+                        <input type="number" id="packageBudget" name="packageBudget" min="0"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                               placeholder="e.g., 50000 INR">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="packageInterests" class="block text-sm font-medium text-gray-700 mb-1">Interests / Activities (Optional)</label>
+                        <textarea id="packageInterests" name="packageInterests" rows="3"
+                                  class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                  placeholder="e.g., Adventure sports, Cultural tours, Beach relaxation"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generated Email Body -->
+            <div class="mt-8 bg-gray-50 p-6 rounded-lg shadow-inner">
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Generated Email Body</h2>
+                <textarea id="emailBody" rows="15" readonly
+                          class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-800 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                <button type="button" id="copyEmailButton"
+                        class="mt-4 w-full inline-flex justify-center py-3 px-6 border border-transparent shadow-sm text-lg font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                    Copy Email to Clipboard
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Get references to elements
+        const enquiryForm = document.getElementById('enquiryForm');
+        const emailBodyTextarea = document.getElementById('emailBody');
+        const copyEmailButton = document.getElementById('copyEmailButton');
+
+        const flightDetails = document.getElementById('flightDetails');
+        const hotelDetails = document.getElementById('hotelDetails');
+        const packageDetails = document.getElementById('packageDetails');
+
+        const flightTab = document.getElementById('flightTab');
+        const hotelTab = document.getElementById('hotelTab');
+        const packageTab = document.getElementById('packageTab');
+
+        const numAdultsInput = document.getElementById('numAdults');
+        const numKidsInput = document.getElementById('numKids');
+        const numInfantsInput = document.getElementById('numInfants');
+        const numTotalPaxInput = document.getElementById('numTotalPax');
+
+        const flightTripTypeRadios = document.querySelectorAll('input[name="flightTripType"]');
+        const flightReturnDateInput = document.getElementById('flightReturnDate');
+        const flightDepartureDateInput = document.getElementById('flightDepartureDate');
+        const hotelCheckinDateInput = document.getElementById('hotelCheckinDate');
+        const hotelCheckoutDateInput = document.getElementById('hotelCheckoutDate');
+        const packageDepartureDateInput = document.getElementById('packageDepartureDate');
+        const packageReturnDateInput = document.getElementById('packageReturnDate');
+
+        let activeFormType = 'flight'; // Default active form
+
+        // Function to set minimum date for date inputs to today
+        function setMinDateForInputs() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInputs = [
+                flightDepartureDateInput,
+                flightReturnDateInput,
+                hotelCheckinDateInput,
+                hotelCheckoutDateInput,
+                packageDepartureDateInput,
+                packageReturnDateInput
+            ];
+            dateInputs.forEach(input => {
+                if (input) { // Check if element exists
+                    input.min = today;
+                }
+            });
+        }
+
+        // Function to show/hide form sections based on tab selection
+        function showForm(formType) {
+            // Hide all sections
+            flightDetails.classList.add('hidden');
+            hotelDetails.classList.add('hidden');
+            packageDetails.classList.add('hidden');
+
+            // Deactivate all tabs
+            flightTab.classList.remove('active');
+            hotelTab.classList.remove('active');
+            packageTab.classList.remove('active');
+
+            // Show selected section and activate tab
+            if (formType === 'flight') {
+                flightDetails.classList.remove('hidden');
+                flightTab.classList.add('active');
+            } else if (formType === 'hotel') {
+                hotelDetails.classList.remove('hidden');
+                hotelTab.classList.add('active');
+            } else if (formType === 'package') {
+                packageDetails.classList.remove('hidden');
+                packageTab.classList.add('active');
+            }
+            activeFormType = formType;
+            updateEmailBody(); // Update email body after switching forms
+        }
+
+        // Function to calculate total passengers
+        function calculateTotalPax() {
+            const adults = parseInt(numAdultsInput.value) || 0;
+            const kids = parseInt(numKidsInput.value) || 0;
+            const infants = parseInt(numInfantsInput.value) || 0;
+            numTotalPaxInput.value = adults + kids + infants;
+        }
+
+        // Function to validate dates (e.g., return date after departure date)
+        function validateDates() {
+            // Flight Dates
+            if (flightDepartureDateInput.value && flightReturnDateInput.value && !flightReturnDateInput.disabled) {
+                if (new Date(flightReturnDateInput.value) < new Date(flightDepartureDateInput.value)) {
+                    flightReturnDateInput.setCustomValidity('Return date cannot be before departure date.');
+                } else {
+                    flightReturnDateInput.setCustomValidity('');
+                }
+            }
+
+            // Hotel Dates
+            if (hotelCheckinDateInput.value && hotelCheckoutDateInput.value) {
+                if (new Date(hotelCheckoutDateInput.value) < new Date(hotelCheckinDateInput.value)) {
+                    hotelCheckoutDateInput.setCustomValidity('Check-out date cannot be before check-in date.');
+                } else {
+                    hotelCheckoutDateInput.setCustomValidity('');
+                }
+            }
+
+            // Package Dates
+            if (packageDepartureDateInput.value && packageReturnDateInput.value) {
+                if (new Date(packageReturnDateInput.value) < new Date(packageDepartureDateInput.value)) {
+                    packageReturnDateInput.setCustomValidity('Return date cannot be before departure date.');
+                } else {
+                    packageReturnDateInput.setCustomValidity('');
+                }
+            }
+        }
+
+        // Function to enable/disable return date for flight booking
+        function toggleFlightReturnDate() {
+            const selectedTripType = document.querySelector('input[name="flightTripType"]:checked').value;
+            flightReturnDateInput.disabled = (selectedTripType === 'One Way' || selectedTripType === 'Multi-City');
+            if (flightReturnDateInput.disabled) {
+                flightReturnDateInput.value = ''; // Clear value if disabled
+                flightReturnDateInput.setCustomValidity(''); // Clear validation message
+            }
+            flightReturnDateInput.required = (selectedTripType === 'Round Trip');
+        }
+
+        // Function to format date for display
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Function to update the email body dynamically
+        function updateEmailBody() {
+            const enquiryName = document.getElementById('enquiryName').value || 'Enquiry Person';
+            let bookingType = activeFormType.charAt(0).toUpperCase() + activeFormType.slice(1);
+            let startDate = 'N/A';
+            let endDate = 'N/A';
+
+            if (activeFormType === 'flight') {
+                startDate = formatDate(flightDepartureDateInput.value);
+                const tripType = document.querySelector('input[name="flightTripType"]:checked')?.value;
+                if (tripType === 'Round Trip') {
+                    endDate = formatDate(flightReturnDateInput.value);
+                }
+            } else if (activeFormType === 'hotel') {
+                startDate = formatDate(hotelCheckinDateInput.value);
+                endDate = formatDate(hotelCheckoutDateInput.value);
+            } else if (activeFormType === 'package') {
+                startDate = formatDate(packageDepartureDateInput.value);
+                endDate = formatDate(packageReturnDateInput.value);
+            }
+
+            // Construct the subject line
+            let subjectLine = `Travel Enquiry - ${bookingType} - ${enquiryName}`;
+            if (startDate !== 'N/A') {
+                subjectLine += ` - ${startDate}`;
+            }
+            if (endDate !== 'N/A' && endDate !== startDate) { // Avoid duplicating date if it's a single day or one-way
+                subjectLine += ` - ${endDate}`;
+            }
+
+            let emailContent = `Subject: ${subjectLine}\n\n`;
+            emailContent += `Dear Travel Agency,\n\n`;
+            emailContent += `I would like to make an enquiry for a ${activeFormType} booking based on the following details:\n\n`;
+
+            // Common Details
+            emailContent += `--- Your Details ---\n`;
+            emailContent += `Name: ${enquiryName}\n`;
+            emailContent += `Contact Number(s): ${document.getElementById('contactNumber').value || 'N/A'}\n`;
+            emailContent += `Email: ${document.getElementById('email').value || 'N/A'}\n`;
+            emailContent += `Address: ${document.getElementById('address').value || 'N/A'}\n`;
+            emailContent += `City: ${document.getElementById('city').value || 'N/A'}\n`;
+            emailContent += `Channel: ${document.getElementById('channel').value || 'N/A'}\n`;
+            emailContent += `Reference: ${document.getElementById('reference').value || 'N/A'}\n`;
+            emailContent += `Total Passengers: ${numTotalPaxInput.value || 'N/A'}\n`;
+            emailContent += `  - Adults: ${numAdultsInput.value || 'N/A'}\n`;
+            emailContent += `  - Kids: ${numKidsInput.value || 'N/A'}\n`;
+            emailContent += `  - Infants: ${numInfantsInput.value || 'N/A'}\n\n`;
+
+            // Specific Details based on active form
+            if (activeFormType === 'flight') {
+                emailContent += `--- Flight Booking Details ---\n`;
+                const tripType = document.querySelector('input[name="flightTripType"]:checked')?.value || 'N/A';
+                emailContent += `Trip Type: ${tripType}\n`;
+                emailContent += `Departure City: ${document.getElementById('flightDepartureCity').value || 'N/A'}\n`;
+                emailContent += `Arrival City: ${document.getElementById('flightArrivalCity').value || 'N/A'}\n`;
+                emailContent += `Departure Date: ${startDate}\n`;
+                if (tripType === 'Round Trip') {
+                    emailContent += `Return Date: ${endDate}\n`;
+                } else if (tripType === 'Multi-City') {
+                    emailContent += `Return Date: Not Applicable (Multi-City)\n`;
+                }
+                emailContent += `Preferred Airline: ${document.getElementById('flightPreferredAirline').value || 'Any'}\n`;
+                emailContent += `Class: ${document.getElementById('flightClass').value || 'N/A'}\n`;
+            } else if (activeFormType === 'hotel') {
+                emailContent += `--- Hotel Booking Details ---\n`;
+                emailContent += `Destination/Hotel Name: ${document.getElementById('hotelDestination').value || 'N/A'}\n`;
+                emailContent += `Check-in Date: ${startDate}\n`;
+                emailContent += `Check-out Date: ${endDate}\n`;
+                emailContent += `Number of Rooms: ${document.getElementById('hotelNumRooms').value || 'N/A'}\n`;
+                emailContent += `Room Type: ${document.getElementById('hotelRoomType').value || 'N/A'}\n`;
+                emailContent += `Star Rating Preference: ${document.getElementById('hotelStarRating').value || 'Any'}\n`;
+            } else if (activeFormType === 'package') {
+                emailContent += `--- Trip Package Details ---\n`;
+                emailContent += `Destination/Package Name: ${document.getElementById('packageDestination').value || 'N/A'}\n`;
+                emailContent += `Departure Date: ${startDate}\n`;
+                emailContent += `Return Date: ${endDate}\n`;
+                emailContent += `Budget: ${document.getElementById('packageBudget').value ? `INR ${document.getElementById('packageBudget').value}` : 'N/A'}\n`;
+                emailContent += `Interests/Activities: ${document.getElementById('packageInterests').value || 'N/A'}\n`;
+            }
+
+            emailContent += `\nKindly provide suitable options and quotes for this enquiry.\n\n`;
+            emailContent += `Thank you,\n${enquiryName}`;
+
+            emailBodyTextarea.value = emailContent;
+        }
+
+        // Event Listeners
+        enquiryForm.addEventListener('input', () => {
+            calculateTotalPax();
+            validateDates();
+            updateEmailBody();
+        });
+
+        // Specific listeners for pax count and flight trip type
+        numAdultsInput.addEventListener('change', calculateTotalPax);
+        numKidsInput.addEventListener('change', calculateTotalPax);
+        numInfantsInput.addEventListener('change', calculateTotalPax);
+
+        flightTripTypeRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                toggleFlightReturnDate();
+                updateEmailBody();
+            });
+        });
+
+        // Copy Email to Clipboard
+        copyEmailButton.addEventListener('click', () => {
+            emailBodyTextarea.select();
+            document.execCommand('copy'); // Fallback for navigator.clipboard.writeText
+            copyEmailButton.textContent = 'Copied!';
+            setTimeout(() => {
+                copyEmailButton.textContent = 'Copy Email to Clipboard';
+            }, 2000);
+        });
+
+        // Initial setup
+        window.onload = () => {
+            setMinDateForInputs();
+            toggleFlightReturnDate(); // Set initial state for return date
+            calculateTotalPax(); // Calculate total pax on load
+            showForm('flight'); // Display flight form by default
+        };
+    </script>
+</body>
+</html>
