@@ -1,33 +1,22 @@
-// enquiries.js
-
+// =============================
+// CONFIG
+// =============================
 const API_URL = "https://sheetdb.io/api/v1/d9vgt1cl45889"; 
 
 const enquiriesList = document.getElementById("enquiriesList");
 const noResults = document.getElementById("noResults");
-
-const flightCountEl = document.getElementById("flightCount");
-const hotelCountEl = document.getElementById("hotelCount");
-const packageCountEl = document.getElementById("packageCount");
-const totalCountEl = document.getElementById("totalCount");
-
-const refreshBtn = document.getElementById("refreshBtn");
-
-// filters
-const typeFilter = document.getElementById("typeFilter");
-const statusFilter = document.getElementById("statusFilter");
-const dateFilter = document.getElementById("dateFilter");
-const searchInput = document.getElementById("searchInput");
-
-// modal
-const enquiryModal = document.getElementById("enquiryModal");
+const modal = document.getElementById("enquiryModal");
 const modalTitle = document.getElementById("modalTitle");
 const modalContent = document.getElementById("modalContent");
 const closeModal = document.getElementById("closeModal");
 const closeModalBtn = document.getElementById("closeModalBtn");
 
 let allEnquiries = [];
+let currentEnquiry = null;
 
-// ✅ Fetch data
+// =============================
+// FETCH & RENDER ENQUIRIES
+// =============================
 async function fetchEnquiries() {
   enquiriesList.innerHTML = `
     <div class="p-6 text-center text-gray-500">
@@ -38,19 +27,16 @@ async function fetchEnquiries() {
 
   try {
     const res = await fetch(API_URL);
-    const data = await res.json();
-    allEnquiries = data;
+    allEnquiries = await res.json();
     renderEnquiries(allEnquiries);
-    updateStats(allEnquiries);
   } catch (err) {
-    enquiriesList.innerHTML = `<div class="p-6 text-center text-red-500">Error loading enquiries</div>`;
     console.error("Error fetching enquiries:", err);
+    enquiriesList.innerHTML = `<div class="p-6 text-center text-red-500">Error loading enquiries</div>`;
   }
 }
 
-// ✅ Render list
 function renderEnquiries(data) {
-  if (!data.length) {
+  if (!data || data.length === 0) {
     enquiriesList.innerHTML = "";
     noResults.classList.remove("hidden");
     return;
@@ -60,63 +46,52 @@ function renderEnquiries(data) {
 
   enquiriesList.innerHTML = data
     .map(
-      (e, idx) => `
-      <div class="enquiry-card p-6 hover:bg-gray-50 cursor-pointer" data-idx="${idx}">
+      (enquiry, index) => `
+      <div class="p-6 enquiry-card cursor-pointer hover:bg-gray-50" data-index="${index}">
         <div class="flex justify-between items-center">
           <div>
-            <p class="font-semibold text-gray-900">${e.Name || "Unknown"}</p>
-            <p class="text-sm text-gray-500">${e.Email || ""} • ${e.ContactNumber || ""}</p>
-            <p class="text-xs text-gray-400">Submitted: ${e.Timestamp || ""}</p>
+            <p class="font-semibold text-gray-800">${enquiry.Name || "Unnamed"}</p>
+            <p class="text-sm text-gray-500">${enquiry.Email || "No email"} • ${enquiry.ContactNumber || "No phone"}</p>
           </div>
           <span class="status-badge status-new">New</span>
         </div>
-        <div class="mt-2 text-sm text-gray-700">
-          ${
-            e.TripType && e.DepartureCity && e.ArrivalCity
-              ? `✈️ Flight: ${e.DepartureCity} → ${e.ArrivalCity} (${e.TripType})`
-              : e.HotelDestination
-              ? `🏨 Hotel: ${e.HotelDestination}`
-              : e.PackageDestination
-              ? `🎒 Package: ${e.PackageDestination}`
-              : "General enquiry"
-          }
-        </div>
+        <p class="mt-2 text-sm text-gray-600">
+          ${enquiry.TripType || ""} • ${enquiry.DepartureCity || ""} → ${enquiry.ArrivalCity || ""}
+        </p>
       </div>
     `
     )
     .join("");
 
-  // attach click handlers for modal
+  // Attach click handlers
   document.querySelectorAll(".enquiry-card").forEach((card) => {
     card.addEventListener("click", () => {
-      const idx = card.dataset.idx;
-      openModal(data[idx]);
+      const index = card.getAttribute("data-index");
+      openModal(allEnquiries[index]);
     });
   });
+
+  // Update stats
+  document.getElementById("flightCount").textContent = data.filter(
+    (e) => e.TripType && e.TripType.toLowerCase().includes("flight")
+  ).length;
+  document.getElementById("hotelCount").textContent = data.filter(
+    (e) => e.HotelDestination
+  ).length;
+  document.getElementById("packageCount").textContent = data.filter(
+    (e) => e.PackageDestination
+  ).length;
+  document.getElementById("totalCount").textContent = data.length;
 }
 
-// ✅ Stats
-function updateStats(data) {
-  let flights = 0,
-    hotels = 0,
-    packages = 0;
-
-  data.forEach((e) => {
-    if (e.TripType) flights++;
-    else if (e.HotelDestination) hotels++;
-    else if (e.PackageDestination) packages++;
-  });
-
-  flightCountEl.textContent = flights;
-  hotelCountEl.textContent = hotels;
-  packageCountEl.textContent = packages;
-  totalCountEl.textContent = data.length;
-}
-
-// ✅ Modal
+// =============================
+// MODAL & NOTES
+// =============================
 function openModal(enquiry) {
+  currentEnquiry = enquiry;
   modalTitle.textContent = enquiry.Name || "Enquiry Details";
 
+  // Basic details
   modalContent.innerHTML = `
     <div class="space-y-2">
       <p><strong>Email:</strong> ${enquiry.Email || "-"}</p>
@@ -126,57 +101,85 @@ function openModal(enquiry) {
       <p><strong>From:</strong> ${enquiry.DepartureCity || "-"} → <strong>To:</strong> ${enquiry.ArrivalCity || "-"}</p>
       <p><strong>Departure:</strong> ${enquiry.DepartureDate || "-"}</p>
       <p><strong>Return:</strong> ${enquiry.ReturnDate || "-"}</p>
-      <p><strong>Hotel:</strong> ${enquiry.HotelDestination || "-"}</p>
-      <p><strong>Package:</strong> ${enquiry.PackageDestination || "-"}</p>
-      <p><strong>Passengers:</strong> Adults ${enquiry.Adults || "0"}, Kids ${enquiry.Kids || "0"}, Infants ${enquiry.Infants || "0"}</p>
       <p><strong>Submitted:</strong> ${enquiry.Timestamp || "-"}</p>
+    </div>
+
+    <div id="notesSection" class="mt-6">
+      <h4 class="text-md font-semibold text-gray-800 mb-2">Notes</h4>
+      <ul id="notesList" class="space-y-2 text-sm text-gray-700"></ul>
+      <div class="mt-3 flex space-x-2">
+        <input type="text" id="newNoteInput" placeholder="Add a note..." 
+               class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        <button id="addNoteBtn" 
+                class="px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+          Add
+        </button>
+      </div>
     </div>
   `;
 
-  enquiryModal.classList.remove("hidden");
+  // Load existing notes
+  const notesList = document.getElementById("notesList");
+  Object.keys(enquiry).forEach((key) => {
+    if (key.toLowerCase().startsWith("notes") && enquiry[key]) {
+      const li = document.createElement("li");
+      li.textContent = enquiry[key];
+      notesList.appendChild(li);
+    }
+  });
+
+  // Attach note add event
+  document.getElementById("addNoteBtn").addEventListener("click", addNote);
+
+  modal.classList.remove("hidden");
 }
 
-closeModal.addEventListener("click", () => {
-  enquiryModal.classList.add("hidden");
-});
-closeModalBtn.addEventListener("click", () => {
-  enquiryModal.classList.add("hidden");
-});
+async function addNote() {
+  if (!currentEnquiry) return;
 
-// ✅ Filters
-function applyFilters() {
-  let filtered = [...allEnquiries];
+  const newNote = document.getElementById("newNoteInput").value.trim();
+  if (!newNote) return;
 
-  const typeVal = typeFilter.value;
-  const searchVal = searchInput.value.toLowerCase();
-
-  if (typeVal === "flight") {
-    filtered = filtered.filter((e) => e.TripType);
-  } else if (typeVal === "hotel") {
-    filtered = filtered.filter((e) => e.HotelDestination);
-  } else if (typeVal === "package") {
-    filtered = filtered.filter((e) => e.PackageDestination);
+  // Find next empty Notes column
+  let noteIndex = 1;
+  while (currentEnquiry[`Notes${noteIndex}`]) {
+    noteIndex++;
   }
+  const noteKey = `Notes${noteIndex}`;
 
-  if (searchVal) {
-    filtered = filtered.filter(
-      (e) =>
-        (e.Name && e.Name.toLowerCase().includes(searchVal)) ||
-        (e.Email && e.Email.toLowerCase().includes(searchVal)) ||
-        (e.City && e.City.toLowerCase().includes(searchVal))
-    );
+  try {
+    await fetch(`${API_URL}/Timestamp/${encodeURIComponent(currentEnquiry.Timestamp)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        data: [{ [noteKey]: newNote }],
+      }),
+    });
+
+    // Update locally
+    currentEnquiry[noteKey] = newNote;
+    const li = document.createElement("li");
+    li.textContent = newNote;
+    document.getElementById("notesList").appendChild(li);
+    document.getElementById("newNoteInput").value = "";
+  } catch (err) {
+    console.error("Error saving note:", err);
+    alert("Failed to save note");
   }
-
-  renderEnquiries(filtered);
-  updateStats(filtered);
 }
 
-typeFilter.addEventListener("change", applyFilters);
-statusFilter.addEventListener("change", applyFilters); // currently only filters visually, no API update
-dateFilter.addEventListener("change", applyFilters);
-searchInput.addEventListener("input", applyFilters);
+// =============================
+// MODAL CONTROLS
+// =============================
+closeModal.addEventListener("click", () => modal.classList.add("hidden"));
+closeModalBtn.addEventListener("click", () => modal.classList.add("hidden"));
 
-refreshBtn.addEventListener("click", fetchEnquiries);
+// =============================
+// REFRESH BUTTON
+// =============================
+document.getElementById("refreshBtn").addEventListener("click", fetchEnquiries);
 
-// load data on page start
+// =============================
+// INIT
+// =============================
 fetchEnquiries();
