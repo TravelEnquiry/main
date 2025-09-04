@@ -194,6 +194,20 @@
                 <div id="modalContent" class="text-sm text-gray-600">
                     <!-- Modal content will be loaded here -->
                 </div>
+                <div id="notesSection" class="mt-6">
+                    <h4 class="text-md font-semibold text-gray-800 mb-2">Notes</h4>
+                    <ul id="notesList" class="space-y-2 text-sm text-gray-700">
+                        <!-- Notes will appear here -->
+                    </ul>
+                    <div class="mt-3 flex space-x-2">
+                        <input type="text" id="newNoteInput" placeholder="Add a note..." 
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <button id="addNoteBtn" 
+                                class="px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">
+                            Add
+                        </button>
+                    </div>
+                </div>
                 <div class="flex justify-end space-x-3 mt-6">
                     <button id="closeModalBtn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors duration-200">
                         Close
