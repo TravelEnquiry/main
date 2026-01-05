@@ -7,6 +7,31 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Authentication Check -->
+    <script>
+        // Check if user is logged in
+        (function() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            const loginTime = sessionStorage.getItem('loginTime');
+
+            // Check if not logged in or session expired (24 hours)
+            if (!isLoggedIn || !loginTime) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Check if session expired (24 hours = 86400000 milliseconds)
+            const currentTime = new Date().getTime();
+            const sessionDuration = currentTime - parseInt(loginTime);
+            if (sessionDuration > 86400000) {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+                return;
+            }
+        })();
+    </script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -35,6 +60,26 @@
         .status-new { background-color: #dbeafe; color: #1e40af; }
         .status-pending { background-color: #fef3c7; color: #92400e; }
         .status-completed { background-color: #d1fae5; color: #065f46; }
+
+        .logout-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 2px solid #ef4444;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.375rem;
+            color: #ef4444;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-button:hover {
+            background-color: #ef4444;
+            color: white;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -47,13 +92,19 @@
                     <p class="text-gray-600 mt-2">Manage and view all travel enquiries</p>
                 </div>
                 <div class="flex space-x-4">
-                    <a href="index.html" 
+                    <a href="index.html"
                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
                         ← Back to Form
                     </a>
-                    <button id="refreshBtn" 
+                    <button id="refreshBtn"
                             class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
                         🔄 Refresh
+                    </button>
+                    <button id="logoutButton" class="logout-button">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Logout
                     </button>
                 </div>
             </div>
