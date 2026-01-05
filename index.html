@@ -7,474 +7,47 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            box-sizing: border-box;
-            position: relative;
-            overflow-x: hidden;
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        .form-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
-            width: 100%;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 3rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            position: relative;
-            z-index: 2;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .form-container::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3);
-            border-radius: 2rem;
-            z-index: -1;
-            opacity: 0.3;
-            animation: borderGlow 3s ease-in-out infinite alternate;
-        }
-        
-        @keyframes borderGlow {
-            0% { opacity: 0.3; }
-            100% { opacity: 0.6; }
-        }
-        
-        .page-title {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-align: center;
-            font-size: 3.5rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .page-subtitle {
-            text-align: center;
-            color: #6b7280;
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-            font-weight: 500;
-        }
-        
-        .tab-navigation {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 2rem;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        .tab-button {
-            padding: 1rem 2rem;
-            border-radius: 1rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            border: none;
-            cursor: pointer;
-            min-width: 140px;
-        }
-        
-        .tab-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .tab-button:hover::before {
-            left: 100%;
-        }
-        
-        .tab-button:not(.active) {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            color: #64748b;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        
-        .tab-button:not(.active):hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .tab-button.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 10px 25px -3px rgba(102, 126, 234, 0.4);
-            transform: scale(1.05);
-        }
-        
-        .form-section {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-        }
-        
-        .form-section:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, #374151 0%, #6b7280 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .md\\:col-span-2 {
-            grid-column: span 2;
-        }
-        
-        @media (max-width: 768px) {
-            .md\\:col-span-2 {
-                grid-column: span 1;
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Authentication Check -->
+    <script>
+        // Check if user is logged in
+        (function() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            const loginTime = sessionStorage.getItem('loginTime');
+
+            // Check if not logged in or session expired (24 hours)
+            if (!isLoggedIn || !loginTime) {
+                window.location.href = 'login.html';
+                return;
             }
-        }
-        
-        .form-group {
-            position: relative;
-        }
-        
-        .form-label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.5rem;
-            transition: color 0.3s ease;
-        }
-        
-        .form-label.required::after {
-            content: ' *';
-            color: #ef4444;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: white;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            transform: translateY(-1px);
-        }
-        
-        .form-input:hover {
-            border-color: #d1d5db;
-        }
-        
-        .form-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.75rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-        }
-        
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        
-        .passenger-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-        }
-        
-        .passenger-input {
-            text-align: center;
-            font-weight: 600;
-        }
-        
-        .passenger-input[readonly] {
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-            color: #6b7280;
-            font-weight: 700;
-        }
-        
-        .radio-group {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .radio-option:hover {
-            background: rgba(102, 126, 234, 0.1);
-        }
-        
-        .radio-option input[type="radio"] {
-            width: 1.2rem;
-            height: 1.2rem;
-            accent-color: #667eea;
-        }
-        
-        .email-section {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border: 1px solid #f59e0b;
-        }
-        
-        .email-textarea {
-            background: white;
-            border: 2px solid #f59e0b;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            line-height: 1.6;
-        }
-        
-        .email-textarea:focus {
-            border-color: #f59e0b;
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-        }
-        
-        .copy-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 1rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        
-        .copy-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.2);
-        }
-        
-        .copy-button:active {
-            transform: translateY(0);
-        }
-        
-        .submit-button {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            padding: 1.25rem 2.5rem;
-            border-radius: 1.5rem;
-            font-size: 1.25rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 25px -3px rgba(16, 185, 129, 0.4);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        .submit-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 40px -3px rgba(16, 185, 129, 0.5);
-        }
-        
-        .submit-button:active {
-            transform: translateY(-1px);
-        }
-        
-        .submit-button::before {
-            content: '✈️';
-            margin-right: 0.5rem;
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .form-container {
-                padding: 2rem;
-                margin: 1rem;
+
+            // Check if session expired (24 hours = 86400000 milliseconds)
+            const currentTime = new Date().getTime();
+            const sessionDuration = currentTime - parseInt(loginTime);
+            if (sessionDuration > 86400000) {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+                return;
             }
-            
-            .page-title {
-                font-size: 3rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            .form-container {
-                padding: 1.5rem;
-                border-radius: 1.5rem;
-            }
-            
-            .page-title {
-                font-size: 2.5rem;
-            }
-            
-            .page-subtitle {
-                font-size: 1rem;
-            }
-            
-            .tab-navigation {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .tab-button {
-                width: 100%;
-                max-width: 300px;
-                min-width: auto;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .passenger-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .radio-group {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-            
-            .radio-option {
-                justify-content: center;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .form-container {
-                padding: 1rem;
-                border-radius: 1rem;
-            }
-            
-            .page-title {
-                font-size: 2rem;
-            }
-            
-            .form-section {
-                padding: 1.5rem;
-            }
-            
-            .section-title {
-                font-size: 1.25rem;
-            }
-            
-            .submit-button {
-                padding: 1rem 2rem;
-                font-size: 1.1rem;
-            }
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-        }
-        
-        /* Animation for form sections */
-        .form-section {
-            animation: slideInUp 0.6s ease-out;
-        }
-        
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Stagger animation for form sections */
-        .form-section:nth-child(1) { animation-delay: 0.1s; }
-        .form-section:nth-child(2) { animation-delay: 0.2s; }
-        .form-section:nth-child(3) { animation-delay: 0.3s; }
-        .form-section:nth-child(4) { animation-delay: 0.4s; }
-        .form-section:nth-child(5) { animation-delay: 0.5s; }
-    </style>
+        })();
+    </script>
 </head>
 <body class="antialiased">
+    <!-- Logout Button -->
+    <button id="logoutButton" class="logout-button">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+        Logout
+    </button>
+
     <div class="form-container">
         <h1 class="page-title">Travel Enquiry Form</h1>
         <p class="page-subtitle">Plan your perfect journey with our comprehensive travel enquiry system</p>
-        
+
 
 
         <!-- Tab Navigation -->
@@ -576,10 +149,6 @@
                                 <input type="radio" name="flightTripType" value="Round Trip">
                                 <span>Round Trip</span>
                             </label>
-                            <label class="radio-option">
-                                <input type="radio" name="flightTripType" value="Multi-City">
-                                <span>Multi-City</span>
-                            </label>
                         </div>
                     </div>
                                          <div class="form-group">
@@ -615,6 +184,11 @@
                              <option value="Business">💼 Business</option>
                              <option value="First Class">👑 First Class</option>
                          </select>
+                     </div>
+                     <div class="form-group md:col-span-2">
+                         <label for="flightNotes" class="form-label">Notes / Preferences</label>
+                         <textarea id="flightNotes" name="flightNotes" rows="3"
+                                   class="form-input form-textarea" placeholder="Any special requests, preferences, or additional information..."></textarea>
                      </div>
                 </div>
             </div>
@@ -662,6 +236,11 @@
                             <option value="5 Star">⭐⭐⭐⭐⭐ 5 Star</option>
                         </select>
                     </div>
+                    <div class="form-group md:col-span-2">
+                        <label for="hotelNotes" class="form-label">Notes / Preferences</label>
+                        <textarea id="hotelNotes" name="hotelNotes" rows="3"
+                                  class="form-input form-textarea" placeholder="Any special requests, preferences, or additional information..."></textarea>
+                    </div>
                 </div>
             </div>
 
@@ -694,17 +273,48 @@
                         <textarea id="packageInterests" name="packageInterests" rows="3"
                                   class="form-input form-textarea" placeholder="e.g., Adventure sports, Cultural tours, Beach relaxation"></textarea>
                     </div>
+                    <div class="form-group md:col-span-2">
+                        <label for="packageNotes" class="form-label">Notes / Preferences</label>
+                        <textarea id="packageNotes" name="packageNotes" rows="3"
+                                  class="form-input form-textarea" placeholder="Any special requests, preferences, or additional information..."></textarea>
+                    </div>
                 </div>
             </div>
 
-            <!-- Generated Email Body -->
+            <!-- Three Output Sections -->
+            <!-- WhatsApp Enquiry Section -->
+            <div class="form-section whatsapp-enquiry-section">
+                <h2 class="section-title">💬 WhatsApp Enquiry (Customer)</h2>
+                <p class="text-sm text-gray-600 mb-3">Complete enquiry with all details for customer</p>
+                <textarea id="whatsappEnquiry" rows="12" readonly
+                          class="form-input whatsapp-textarea w-full"></textarea>
+                <button type="button" id="copyWhatsappEnquiryButton"
+                        class="copy-button mt-4 w-full" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    📋 Copy WhatsApp Enquiry
+                </button>
+            </div>
+
+            <!-- Email Section -->
             <div class="form-section email-section">
-                <h2 class="section-title">📧 Generated Email Body</h2>
-                <textarea id="emailBody" rows="15" readonly
+                <h2 class="section-title">📧 Email Body (Without Personal Info)</h2>
+                <p class="text-sm text-gray-600 mb-3">Enquiry details excluding name, contact, email, and address</p>
+                <textarea id="emailBody" rows="12" readonly
                           class="form-input email-textarea w-full"></textarea>
                 <button type="button" id="copyEmailButton"
                         class="copy-button mt-4 w-full">
                     📋 Copy Email to Clipboard
+                </button>
+            </div>
+
+            <!-- WhatsApp Vendor Section -->
+            <div class="form-section whatsapp-vendor-section">
+                <h2 class="section-title">📱 WhatsApp Vendor (Without Personal Info)</h2>
+                <p class="text-sm text-gray-600 mb-3">Complete details excluding name, contact, email, and address</p>
+                <textarea id="whatsappVendor" rows="12" readonly
+                          class="form-input whatsapp-vendor-textarea w-full"></textarea>
+                <button type="button" id="copyWhatsappVendorButton"
+                        class="copy-button mt-4 w-full" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                    📋 Copy WhatsApp Vendor Message
                 </button>
             </div>
 
