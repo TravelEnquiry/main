@@ -44,6 +44,8 @@ function initializeStorage() {
 
 // Global variables
 let enquiryForm, emailBodyTextarea, copyEmailButton;
+let whatsappEnquiryTextarea, copyWhatsappEnquiryButton;
+let whatsappVendorTextarea, copyWhatsappVendorButton;
 let flightDetails, hotelDetails, packageDetails;
 let flightTab, hotelTab, packageTab;
 let numAdultsInput, numKidsInput, numInfantsInput, numTotalPaxInput;
@@ -58,6 +60,10 @@ function initializeElements() {
     enquiryForm = document.getElementById('enquiryForm');
     emailBodyTextarea = document.getElementById('emailBody');
     copyEmailButton = document.getElementById('copyEmailButton');
+    whatsappEnquiryTextarea = document.getElementById('whatsappEnquiry');
+    copyWhatsappEnquiryButton = document.getElementById('copyWhatsappEnquiryButton');
+    whatsappVendorTextarea = document.getElementById('whatsappVendor');
+    copyWhatsappVendorButton = document.getElementById('copyWhatsappVendorButton');
 
     flightDetails = document.getElementById('flightDetails');
     hotelDetails = document.getElementById('hotelDetails');
@@ -176,7 +182,7 @@ function validateDates() {
 // Function to enable/disable return date for flight booking
 function toggleFlightReturnDate() {
     const selectedTripType = document.querySelector('input[name="flightTripType"]:checked').value;
-    flightReturnDateInput.disabled = (selectedTripType === 'One Way' || selectedTripType === 'Multi-City');
+    flightReturnDateInput.disabled = (selectedTripType === 'One Way');
     if (flightReturnDateInput.disabled) {
         flightReturnDateInput.value = ''; // Clear value if disabled
         flightReturnDateInput.setCustomValidity(''); // Clear validation message
@@ -191,12 +197,20 @@ function formatDate(dateString) {
     return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
-// Function to update the email body dynamically
+// Function to update all three sections dynamically
 function updateEmailBody() {
     const enquiryName = document.getElementById('enquiryName').value || 'Enquiry Person';
+    const contactNumber = document.getElementById('contactNumber').value || 'N/A';
+    const email = document.getElementById('email').value || 'N/A';
+    const address = document.getElementById('address').value || 'N/A';
+    const city = document.getElementById('city').value || 'N/A';
+    const channel = document.getElementById('channel').value || 'N/A';
+    const reference = document.getElementById('reference').value || 'N/A';
+
     let bookingType = activeFormType.charAt(0).toUpperCase() + activeFormType.slice(1);
     let startDate = 'N/A';
     let endDate = 'N/A';
+    let notes = '';
 
     if (activeFormType === 'flight') {
         startDate = formatDate(flightDepartureDateInput.value);
@@ -204,77 +218,113 @@ function updateEmailBody() {
         if (tripType === 'Round Trip') {
             endDate = formatDate(flightReturnDateInput.value);
         }
+        notes = document.getElementById('flightNotes')?.value || '';
     } else if (activeFormType === 'hotel') {
         startDate = formatDate(hotelCheckinDateInput.value);
         endDate = formatDate(hotelCheckoutDateInput.value);
+        notes = document.getElementById('hotelNotes')?.value || '';
     } else if (activeFormType === 'package') {
         startDate = formatDate(packageDepartureDateInput.value);
         endDate = formatDate(packageReturnDateInput.value);
+        notes = document.getElementById('packageNotes')?.value || '';
     }
 
-    // Construct the subject line
-    let subjectLine = `Travel Enquiry - ${bookingType} - ${enquiryName}`;
-    if (startDate !== 'N/A') {
-        subjectLine += ` - ${startDate}`;
-    }
-    if (endDate !== 'N/A' && endDate !== startDate) { // Avoid duplicating date if it's a single day or one-way
-        subjectLine += ` - ${endDate}`;
-    }
+    // === 1. WhatsApp Enquiry (Customer) - Complete with ALL details ===
+    let whatsappEnquiry = `🌍 *Travel Enquiry - ${bookingType}*\n\n`;
+    whatsappEnquiry += `👤 *Customer Details:*\n`;
+    whatsappEnquiry += `Name: ${enquiryName}\n`;
+    whatsappEnquiry += `📞 Contact: ${contactNumber}\n`;
+    whatsappEnquiry += `📧 Email: ${email}\n`;
+    whatsappEnquiry += `🏠 Address: ${address}\n`;
+    whatsappEnquiry += `🌆 City: ${city}\n`;
+    whatsappEnquiry += `📍 Channel: ${channel}\n`;
+    if (reference !== 'N/A') whatsappEnquiry += `🔗 Reference: ${reference}\n`;
+    whatsappEnquiry += `\n👥 *Passengers:* ${numTotalPaxInput.value || 'N/A'}\n`;
+    whatsappEnquiry += `Adults: ${numAdultsInput.value || 'N/A'} | Kids: ${numKidsInput.value || 'N/A'} | Infants: ${numInfantsInput.value || 'N/A'}\n\n`;
 
-    let emailContent = `Subject: ${subjectLine}\n\n`;
+    // Add specific details
+    whatsappEnquiry += getSpecificDetails(true);
+    if (notes) whatsappEnquiry += `\n📝 *Notes:* ${notes}\n`;
+
+    whatsappEnquiryTextarea.value = whatsappEnquiry;
+
+    // === 2. Email Section (WITHOUT name, contact, email, address) ===
+    let emailContent = `Subject: Travel Enquiry - ${bookingType} - ${startDate}\n\n`;
     emailContent += `Dear Travel Agency,\n\n`;
-    emailContent += `I would like to make an enquiry for a ${activeFormType} booking based on the following details:\n\n`;
+    emailContent += `I would like to make an enquiry for a ${activeFormType} booking:\n\n`;
 
-    // Common Details
-    emailContent += `--- Your Details ---\n`;
-    emailContent += `Name: ${enquiryName}\n`;
-    emailContent += `Contact Number(s): ${document.getElementById('contactNumber').value || 'N/A'}\n`;
-    emailContent += `Email: ${document.getElementById('email').value || 'N/A'}\n`;
-    emailContent += `Address: ${document.getElementById('address').value || 'N/A'}\n`;
-    emailContent += `City: ${document.getElementById('city').value || 'N/A'}\n`;
-    emailContent += `Channel: ${document.getElementById('channel').value || 'N/A'}\n`;
-    emailContent += `Reference: ${document.getElementById('reference').value || 'N/A'}\n`;
+    if (reference !== 'N/A') emailContent += `Reference: ${reference}\n`;
     emailContent += `Total Passengers: ${numTotalPaxInput.value || 'N/A'}\n`;
     emailContent += `  - Adults: ${numAdultsInput.value || 'N/A'}\n`;
     emailContent += `  - Kids: ${numKidsInput.value || 'N/A'}\n`;
     emailContent += `  - Infants: ${numInfantsInput.value || 'N/A'}\n\n`;
 
-    // Specific Details based on active form
-    if (activeFormType === 'flight') {
-        emailContent += `--- Flight Booking Details ---\n`;
-        const tripType = document.querySelector('input[name="flightTripType"]:checked')?.value || 'N/A';
-        emailContent += `Trip Type: ${tripType}\n`;
-        emailContent += `Departure City: ${document.getElementById('flightDepartureCity').value || 'N/A'}\n`;
-        emailContent += `Arrival City: ${document.getElementById('flightArrivalCity').value || 'N/A'}\n`;
-        emailContent += `Departure Date: ${startDate}\n`;
-        if (tripType === 'Round Trip') {
-            emailContent += `Return Date: ${endDate}\n`;
-        } else if (tripType === 'Multi-City') {
-            emailContent += `Return Date: Not Applicable (Multi-City)\n`;
-        }
-        emailContent += `Preferred Airline: ${document.getElementById('flightPreferredAirline').value || 'Any'}\n`;
-        emailContent += `Class: ${document.getElementById('flightClass').value || 'N/A'}\n`;
-    } else if (activeFormType === 'hotel') {
-        emailContent += `--- Hotel Booking Details ---\n`;
-        emailContent += `Destination/Hotel Name: ${document.getElementById('hotelDestination').value || 'N/A'}\n`;
-        emailContent += `Check-in Date: ${startDate}\n`;
-        emailContent += `Check-out Date: ${endDate}\n`;
-        emailContent += `Number of Rooms: ${document.getElementById('hotelNumRooms').value || 'N/A'}\n`;
-        emailContent += `Room Type: ${document.getElementById('hotelRoomType').value || 'N/A'}\n`;
-        emailContent += `Star Rating Preference: ${document.getElementById('hotelStarRating').value || 'Any'}\n`;
-    } else if (activeFormType === 'package') {
-        emailContent += `--- Trip Package Details ---\n`;
-        emailContent += `Destination/Package Name: ${document.getElementById('packageDestination').value || 'N/A'}\n`;
-        emailContent += `Departure Date: ${startDate}\n`;
-        emailContent += `Return Date: ${endDate}\n`;
-        emailContent += `Budget: ${document.getElementById('packageBudget').value ? `INR ${document.getElementById('packageBudget').value}` : 'N/A'}\n`;
-        emailContent += `Interests/Activities: ${document.getElementById('packageInterests').value || 'N/A'}\n`;
-    }
-
-    emailContent += `\nKindly provide suitable options and quotes for this enquiry.\n\n`;
-    emailContent += `Thank you,\n${enquiryName}`;
+    emailContent += getSpecificDetails(false);
+    if (notes) emailContent += `\nNotes/Preferences: ${notes}\n`;
+    emailContent += `\nKindly provide suitable options and quotes.\n\nThank you`;
 
     emailBodyTextarea.value = emailContent;
+
+    // === 3. WhatsApp Vendor (WITHOUT name, contact, email, address) ===
+    let whatsappVendor = `🌍 *${bookingType} Enquiry*\n\n`;
+
+    if (reference !== 'N/A') whatsappVendor += `Reference: ${reference}\n`;
+    whatsappVendor += `\n👥 *Passengers:* ${numTotalPaxInput.value || 'N/A'}\n`;
+    whatsappVendor += `Adults: ${numAdultsInput.value || 'N/A'} | Kids: ${numKidsInput.value || 'N/A'} | Infants: ${numInfantsInput.value || 'N/A'}\n\n`;
+
+    whatsappVendor += getSpecificDetails(true);
+    if (notes) whatsappVendor += `\n📝 *Notes:* ${notes}\n`;
+
+    whatsappVendorTextarea.value = whatsappVendor;
+}
+
+// Helper function to get specific booking details
+function getSpecificDetails(isWhatsApp) {
+    let content = '';
+    const prefix = isWhatsApp ? '*' : '';
+    const suffix = isWhatsApp ? '*' : '';
+
+    if (activeFormType === 'flight') {
+        const tripType = document.querySelector('input[name="flightTripType"]:checked')?.value || 'N/A';
+        const startDate = formatDate(flightDepartureDateInput.value);
+        const endDate = formatDate(flightReturnDateInput.value);
+
+        content += `${prefix}✈️ Flight Details:${suffix}\n`;
+        content += `Trip Type: ${tripType}\n`;
+        content += `From: ${document.getElementById('flightDepartureCity').value || 'N/A'}\n`;
+        content += `To: ${document.getElementById('flightArrivalCity').value || 'N/A'}\n`;
+        content += `Departure: ${startDate}\n`;
+        if (tripType === 'Round Trip') {
+            content += `Return: ${endDate}\n`;
+        }
+        content += `Airline: ${document.getElementById('flightPreferredAirline').value || 'Any'}\n`;
+        content += `Class: ${document.getElementById('flightClass').value || 'N/A'}\n`;
+
+    } else if (activeFormType === 'hotel') {
+        const startDate = formatDate(hotelCheckinDateInput.value);
+        const endDate = formatDate(hotelCheckoutDateInput.value);
+
+        content += `${prefix}🏨 Hotel Details:${suffix}\n`;
+        content += `Destination: ${document.getElementById('hotelDestination').value || 'N/A'}\n`;
+        content += `Check-in: ${startDate}\n`;
+        content += `Check-out: ${endDate}\n`;
+        content += `Rooms: ${document.getElementById('hotelNumRooms').value || 'N/A'}\n`;
+        content += `Room Type: ${document.getElementById('hotelRoomType').value || 'N/A'}\n`;
+        content += `Star Rating: ${document.getElementById('hotelStarRating').value || 'Any'}\n`;
+
+    } else if (activeFormType === 'package') {
+        const startDate = formatDate(packageDepartureDateInput.value);
+        const endDate = formatDate(packageReturnDateInput.value);
+
+        content += `${prefix}🎒 Package Details:${suffix}\n`;
+        content += `Destination: ${document.getElementById('packageDestination').value || 'N/A'}\n`;
+        content += `Departure: ${startDate}\n`;
+        content += `Return: ${endDate}\n`;
+        content += `Budget: ${document.getElementById('packageBudget').value ? `INR ${document.getElementById('packageBudget').value}` : 'N/A'}\n`;
+        content += `Interests: ${document.getElementById('packageInterests').value || 'N/A'}\n`;
+    }
+
+    return content;
 }
 
 // Function to validate form before submission
@@ -352,7 +402,9 @@ function collectFormData() {
         numKids: parseInt(numKidsInput.value) || 0,
         numInfants: parseInt(numInfantsInput.value) || 0,
         numTotalPax: parseInt(numTotalPaxInput.value) || 0,
-        emailBody: emailBodyTextarea.value
+        emailBody: emailBodyTextarea.value,
+        whatsappEnquiry: whatsappEnquiryTextarea.value,
+        whatsappVendor: whatsappVendorTextarea.value
     };
 
     // Add specific details based on enquiry type
@@ -364,7 +416,8 @@ function collectFormData() {
             departureDate: flightDepartureDateInput.value,
             returnDate: flightReturnDateInput.value,
             preferredAirline: document.getElementById('flightPreferredAirline').value,
-            class: document.getElementById('flightClass').value
+            class: document.getElementById('flightClass').value,
+            notes: document.getElementById('flightNotes')?.value || ''
         };
     } else if (activeFormType === 'hotel') {
         formData.hotelDetails = {
@@ -373,7 +426,8 @@ function collectFormData() {
             checkoutDate: hotelCheckoutDateInput.value,
             numRooms: document.getElementById('hotelNumRooms').value,
             roomType: document.getElementById('hotelRoomType').value,
-            starRating: document.getElementById('hotelStarRating').value
+            starRating: document.getElementById('hotelStarRating').value,
+            notes: document.getElementById('hotelNotes')?.value || ''
         };
     } else if (activeFormType === 'package') {
         formData.packageDetails = {
@@ -381,17 +435,20 @@ function collectFormData() {
             departureDate: packageDepartureDateInput.value,
             returnDate: packageReturnDateInput.value,
             budget: document.getElementById('packageBudget').value,
-            interests: document.getElementById('packageInterests').value
+            interests: document.getElementById('packageInterests').value,
+            notes: document.getElementById('packageNotes')?.value || ''
         };
     }
 
     return formData;
 }
 
-// Function to save enquiry to local file and localStorage
-async function saveEnquiryToSheetDB() {
+// Function to save enquiry to MySQL database via PHP
+async function saveEnquiryToDatabase() {
+  let formData;
+
   try {
-    const formData = collectFormData();
+    formData = collectFormData();
 
     // Validate required fields
     if (!formData.enquiryName || !formData.contactNumber || !formData.email || !formData.channel) {
@@ -399,63 +456,58 @@ async function saveEnquiryToSheetDB() {
       return false;
     }
 
-    // Map to your SheetDB columns
-    const enquiryRow = {
-      Name: formData.enquiryName,
-      ContactNumber: formData.contactNumber,
-      Email: formData.email,
-      City: formData.city,
-      Address: formData.address,
-      Channel: formData.channel,
-      Reference: formData.reference,
-      Adults: formData.numAdults,
-      Kids: formData.numKids,
-      Infants: formData.numInfants,
-      TotalPassengers: formData.numTotalPax,
-      TripType: formData.flightDetails?.tripType || "",
-      DepartureCity: formData.flightDetails?.departureCity || "",
-      ArrivalCity: formData.flightDetails?.arrivalCity || "",
-      DepartureDate: formData.flightDetails?.departureDate || "",
-      ReturnDate: formData.flightDetails?.returnDate || "",
-      PreferredAirline: formData.flightDetails?.preferredAirline || "",
-      Class: formData.flightDetails?.class || "",
-      HotelDestination: formData.hotelDetails?.destination || "",
-      HotelCheckinDate: formData.hotelDetails?.checkinDate || "",
-      HotelCheckoutDate: formData.hotelDetails?.checkoutDate || "",
-      NumberOfRooms: formData.hotelDetails?.numRooms || "",
-      RoomType: formData.hotelDetails?.roomType || "",
-      StarRating: formData.hotelDetails?.starRating || "",
-      PackageDestination: formData.packageDetails?.destination || "",
-      PackageDepartureDate: formData.packageDetails?.departureDate || "",
-      PackageReturnDate: formData.packageDetails?.returnDate || "",
-      Budget: formData.packageDetails?.budget || "",
-      Interests: formData.packageDetails?.interests || "",
-      Timestamp: new Date().toISOString()
-    };
-
-    // Send to SheetDB
-    const response = await fetch("https://sheetdb.io/api/v1/d9vgt1cl45889", {
+    // Send to PHP backend
+    const response = await fetch("save_enquiry.php", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: [enquiryRow] })
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(formData)
     });
 
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    // Check if response is ok
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-    showNotification('✅ Enquiry saved!', 'success');
+    const result = await response.json();
 
-    // Save to localStorage as backup
-    saveToLocalStorage(formData);
+    if (result.success) {
+      showNotification('✅ Enquiry saved successfully!', 'success');
 
-    // Reset form
-    enquiryForm.reset();
-    calculateTotalPax();
-    updateEmailBody();
+      // Save to localStorage as backup
+      saveToLocalStorage(formData);
 
-    return true;
+      // Reset form
+      enquiryForm.reset();
+      calculateTotalPax();
+      updateEmailBody();
+
+      return true;
+    } else {
+      throw new Error(result.message || 'Failed to save enquiry');
+    }
+
   } catch (error) {
     console.error("Error saving enquiry:", error);
-    showNotification('❌ Failed to save enquiry. Please try again.', 'error');
+
+    // More detailed error message
+    let errorMsg = 'Failed to save enquiry';
+    if (error.message.includes('Failed to fetch')) {
+      errorMsg = 'Cannot connect to server. Please check if save_enquiry.php exists.';
+    } else {
+      errorMsg = error.message;
+    }
+
+    showNotification('❌ ' + errorMsg, 'error');
+
+    // Save to localStorage as fallback (only if formData was collected)
+    if (formData) {
+      saveToLocalStorage(formData);
+      showNotification('💾 Saved to local storage as backup', 'success');
+    }
+
     return false;
   }
 }
@@ -735,26 +787,61 @@ function initializeEventListeners() {
         });
     });
 
-    // Copy Email to Clipboard
-    copyEmailButton.addEventListener('click', () => {
-        emailBodyTextarea.select();
-        document.execCommand('copy'); // Fallback for navigator.clipboard.writeText
-        copyEmailButton.textContent = 'Copied!';
+    // Copy WhatsApp Enquiry to Clipboard
+    copyWhatsappEnquiryButton.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(whatsappEnquiryTextarea.value);
+            copyWhatsappEnquiryButton.textContent = '✅ Copied!';
+        } catch (err) {
+            whatsappEnquiryTextarea.select();
+            document.execCommand('copy');
+            copyWhatsappEnquiryButton.textContent = '✅ Copied!';
+        }
         setTimeout(() => {
-            copyEmailButton.textContent = 'Copy Email to Clipboard';
+            copyWhatsappEnquiryButton.textContent = '📋 Copy WhatsApp Enquiry';
+        }, 2000);
+    });
+
+    // Copy Email to Clipboard
+    copyEmailButton.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(emailBodyTextarea.value);
+            copyEmailButton.textContent = '✅ Copied!';
+        } catch (err) {
+            emailBodyTextarea.select();
+            document.execCommand('copy');
+            copyEmailButton.textContent = '✅ Copied!';
+        }
+        setTimeout(() => {
+            copyEmailButton.textContent = '📋 Copy Email to Clipboard';
+        }, 2000);
+    });
+
+    // Copy WhatsApp Vendor to Clipboard
+    copyWhatsappVendorButton.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(whatsappVendorTextarea.value);
+            copyWhatsappVendorButton.textContent = '✅ Copied!';
+        } catch (err) {
+            whatsappVendorTextarea.select();
+            document.execCommand('copy');
+            copyWhatsappVendorButton.textContent = '✅ Copied!';
+        }
+        setTimeout(() => {
+            copyWhatsappVendorButton.textContent = '📋 Copy WhatsApp Vendor Message';
         }, 2000);
     });
 
     // Form submission
     enquiryForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         // Custom validation
         if (!validateForm()) {
             return;
         }
-        
-        await saveEnquiryToSheetDB();
+
+        await saveEnquiryToDatabase();
     });
 }
 
@@ -782,17 +869,34 @@ function initializeApp() {
     console.log('App initialization complete');
 }
 
+// Logout functionality
+function logout() {
+    // Clear session storage
+    sessionStorage.clear();
+
+    // Redirect to login page
+    window.location.href = 'login.html';
+}
+
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing app...');
-    
+
     // Initialize app immediately
     initializeApp();
-    
+
     // Initialize storage system
     initializeStorage();
-    
+
+    // Add logout button event listener
+    const logoutButton = document.getElementById('logoutButton');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                logout();
+            }
+        });
+    }
+
     console.log('App initialization complete');
 });
-
-
